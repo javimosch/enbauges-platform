@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.19/dist/full.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    [v-cloak] { display: none; }
+    .fc-event { cursor: pointer; }
+  </style>
+</head>
+<body class="min-h-screen bg-base-200">
+  <div id="app" v-cloak>
+    <div class="navbar bg-base-100 shadow-lg">
+      <div class="flex-1">
+        <a class="btn btn-ghost text-xl" @click="goHome">🏔️ Enbauges</a>
+      </div>
+      <div class="flex-none gap-2" v-if="state.user">
+        <div class="dropdown dropdown-end" v-if="state.orgs.length">
+          <label tabindex="0" class="btn btn-ghost">
+            {{ state.currentOrg?.name || 'Sélectionner org' }}
+            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </label>
+          <ul tabindex="0" class="dropdown-content z-50 menu p-2 shadow bg-base-100 rounded-box w-52">
+            <li v-for="org in state.orgs" :key="org._id">
+              <a @click="selectOrg(org)" :class="{ active: state.currentOrg?._id === org._id }">
+                {{ org.name }}
+                <span class="badge badge-sm" v-if="org.myRole === 'owner'">owner</span>
+                <span class="badge badge-sm badge-secondary" v-else-if="org.myRole === 'admin'">admin</span>
+              </a>
+            </li>
+            <li class="border-t mt-2 pt-2"><a @click="showCreateOrg = true">+ Créer une organisation</a></li>
+          </ul>
+        </div>
+        <div class="dropdown dropdown-end">
+          <label tabindex="0" class="btn btn-ghost btn-circle avatar placeholder">
+            <div class="bg-primary text-primary-content rounded-full w-10">
+              <span>{{ state.user.name?.[0] || state.user.email[0] }}</span>
+            </div>
+          </label>
+          <ul tabindex="0" class="dropdown-content z-50 menu p-2 shadow bg-base-100 rounded-box w-52">
+            <li><a>{{ state.user.email }}</a></li>
+            <li><a @click="logout">Déconnexion</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="flex-none" v-else>
+        <button class="btn btn-primary btn-sm" @click="view = 'login'">Connexion</button>
+      </div>
+    </div>
+
+    <div class="container mx-auto p-4 max-w-6xl">
+      <div v-if="state.loading" class="flex justify-center py-20">
+        <span class="loading loading-spinner loading-lg"></span>
+      </div>
+
+      <div v-else-if="view === 'invite'" class="max-w-md mx-auto">
+        <div class="card bg-base-100 shadow-xl">
+          <div class="card-body">
+            <h2 class="card-title">Invitation</h2>
+            <div v-if="inviteInfo">
+              <p class="mb-4">Vous êtes invité à rejoindre <strong>{{ inviteInfo.org.name }}</strong> en tant que {{ inviteInfo.role }}.</p>
+              <div v-if="!inviteInfo.userExists">
+                <div class="form-control mb-3">
+                  <label class="label"><span class="label-text">Nom</span></label>
+                  <input type="text" v-model="inviteForm.name" class="input input-bordered">
+                </div>
+                <div class="form-control mb-3">
+                  <label class="label"><span class="label-text">Mot de passe</span></label>
+                  <input type="password" v-model="inviteForm.password" class="input input-bordered">
+                </div>
+              </div>
+              <button class="btn btn-primary w-full" @click="acceptInvite" :disabled="state.submitting">
+                {{ state.submitting ? 'Chargement...' : 'Accepter l\'invitation' }}
+              </button>
+            </div>
+            <div v-else-if="inviteError" class="alert alert-error">{{ inviteError }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div v-else-if="!state.user" class="max-w-md mx-auto">
+        <div class="card bg-base-100 shadow-xl">
+          <div class="card-body">
+            <div class="tabs tabs-boxed mb-4">
+              <a class="tab" :class="{ 'tab-active': view === 'login' }" @click="view = 'login'">Connexion</a>
+              <a class="tab" :class="{ 'tab-active': view === 'register' }" @click="view = 'register'">Inscription</a>
+            </div>
+            <div v-if="view === 'login'">
+              <div class="form-control mb-3">
+                <label class="label"><span class="label-text">Email</span></label>
+                <input type="email" v-model="authForm.email" class="input input-bordered" @keyup.enter="login">
+              </div>
+              <div class="form-control mb-4">
+                <label class="label"><span class="label-text">Mot de passe</span></label>
+                <input type="password" v-model="authForm.password" class="input input-bordered" @keyup.enter="login">
+              </div>
+              <button class="btn btn-primary w-full" @click="login" :disabled="state.submitting">
+                {{ state.submitting ? 'Chargement...' : 'Se connecter' }}
+              </button>
+            </div>
+            <div v-else>
+              <div class="form-control mb-3">
+                <label class="label"><span class="label-text">Nom</span></label>
+                <input type="text" v-model="authForm.name" class="input input-bordered">
+              </div>
+              <div class="form-control mb-3">
+                <label class="label"><span class="label-text">Email</span></label>
+                <input type="email" v-model="authForm.email" class="input input-bordered">
+              </div>
+              <div class="form-control mb-4">
+                <label class="label"><span class="label-text">Mot de passe</span></label>
+                <input type="password" v-model="authForm.password" class="input input-bordered">
+              </div>
+              <button class="btn btn-primary w-full" @click="register" :disabled="state.submitting">
+                {{ state.submitting ? 'Chargement...' : 'S\'inscrire' }}
+              </button>
+            </div>
+            <div v-if="state.error" class="alert alert-error mt-4">{{ state.error }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div v-else-if="!state.currentOrg" class="max-w-lg mx-auto">
+        <div class="card bg-base-100 shadow-xl">
+          <div class="card-body text-center">
+            <h2 class="card-title justify-center">Bienvenue {{ state.user.name || state.user.email }}!</h2>
+            <p class="mb-4">Créez ou rejoignez une organisation pour commencer.</p>
+            <button class="btn btn-primary" @click="showCreateOrg = true">Créer une organisation</button>
+          </div>
+        </div>
+      </div>
+
+      <div v-else>
+        <div class="tabs tabs-boxed mb-4">
+          <a class="tab" :class="{ 'tab-active': tab === 'calendar' }" @click="tab = 'calendar'">📅 Agenda</a>
+          <a class="tab" :class="{ 'tab-active': tab === 'moderation' }" @click="tab = 'moderation'" v-if="isAdmin">
+            🔍 Modération
+            <span class="badge badge-sm badge-warning ml-1" v-if="pendingCount">{{ pendingCount }}</span>
+          </a>
+          <a class="tab" :class="{ 'tab-active': tab === 'members' }" @click="tab = 'members'">👥 Membres</a>
+          <a class="tab" :class="{ 'tab-active': tab === 'settings' }" @click="tab = 'settings'" v-if="isAdmin">⚙️ Paramètres</a>
+        </div>
+
+        <div v-if="tab === 'calendar'" class="card bg-base-100 shadow-xl">
+          <div class="card-body">
+            <div class="flex justify-between items-center mb-4">
+              <h2 class="card-title">Agenda de {{ state.currentOrg.name }}</h2>
+              <button class="btn btn-primary btn-sm" @click="showEventModal = true">+ Ajouter un événement</button>
+            </div>
+            <div id="calendar"></div>
+          </div>
+        </div>
+
+        <div v-if="tab === 'moderation'" class="card bg-base-100 shadow-xl">
+          <div class="card-body">
+            <h2 class="card-title mb-4">Événements en attente</h2>
+            <div v-if="pendingEvents.length === 0" class="text-center py-8 text-base-content/60">
+              Aucun événement en attente de validation
+            </div>
+            <div v-else class="space-y-4">
+              <div v-for="event in pendingEvents" :key="event._id" class="card bg-base-200">
+                <div class="card-body">
+                  <h3 class="font-bold">{{ event.title }}</h3>
+                  <p class="text-sm text-base-content/70">{{ event.description }}</p>
+                  <p class="text-sm">📅 {{ formatDate(event.startAt) }} - {{ formatDate(event.endAt) }}</p>
+                  <p class="text-sm" v-if="event.location">📍 {{ event.location }}</p>
+                  <p class="text-xs text-base-content/50">Par {{ event.createdByUserId?.name || event.createdByUserId?.email }}</p>
+                  <div class="card-actions justify-end mt-2">
+                    <button class="btn btn-success btn-sm" @click="approveEvent(event._id)">✓ Approuver</button>
+                    <button class="btn btn-error btn-sm" @click="showRejectModal(event)">✗ Rejeter</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="tab === 'members'" class="card bg-base-100 shadow-xl">
+          <div class="card-body">
+            <div class="flex justify-between items-center mb-4">
+              <h2 class="card-title">Membres</h2>
+              <button class="btn btn-primary btn-sm" @click="showAddMember = true" v-if="isAdmin">+ Ajouter</button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="table">
+                <thead>
+                  <tr><th>Nom</th><th>Email</th><th>Rôle</th><th v-if="isAdmin"></th></tr>
+                </thead>
+                <tbody>
+                  <tr v-for="m in members" :key="m.userId">
+                    <td>{{ m.name || '-' }}</td>
+                    <td>{{ m.email }}</td>
+                    <td><span class="badge" :class="roleBadgeClass(m.role)">{{ m.role }}</span></td>
+                    <td v-if="isAdmin && m.role !== 'owner'">
+                      <button class="btn btn-ghost btn-xs" @click="removeMember(m.userId)">Retirer</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="tab === 'settings'" class="card bg-base-100 shadow-xl">
+          <div class="card-body">
+            <h2 class="card-title mb-4">Paramètres de l'organisation</h2>
+            <div class="form-control mb-3">
+              <label class="label"><span class="label-text">Nom</span></label>
+              <input type="text" v-model="orgSettings.name" class="input input-bordered">
+            </div>
+            <div class="form-control mb-3">
+              <label class="label"><span class="label-text">Description</span></label>
+              <textarea v-model="orgSettings.description" class="textarea textarea-bordered"></textarea>
+            </div>
+            <div class="form-control mb-4">
+              <label class="label cursor-pointer justify-start gap-4">
+                <input type="checkbox" v-model="orgSettings.allowPublicJoin" class="checkbox">
+                <span class="label-text">Autoriser l'inscription publique</span>
+              </label>
+            </div>
+            <button class="btn btn-primary" @click="saveOrgSettings" :disabled="state.submitting">Enregistrer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <dialog class="modal" :class="{ 'modal-open': showCreateOrg }">
+      <div class="modal-box">
+        <h3 class="font-bold text-lg mb-4">Créer une organisation</h3>
+        <div class="form-control mb-3">
+          <label class="label"><span class="label-text">Nom de l'association/collectif</span></label>
+          <input type="text" v-model="newOrg.name" class="input input-bordered">
+        </div>
+        <div class="form-control mb-3">
+          <label class="label"><span class="label-text">Description</span></label>
+          <textarea v-model="newOrg.description" class="textarea textarea-bordered"></textarea>
+        </div>
+        <div class="modal-action">
+          <button class="btn" @click="showCreateOrg = false">Annuler</button>
+          <button class="btn btn-primary" @click="createOrg" :disabled="state.submitting">Créer</button>
+        </div>
+      </div>
+      <form method="dialog" class="modal-backdrop"><button @click="showCreateOrg = false">close</button></form>
+    </dialog>
+
+    <dialog class="modal" :class="{ 'modal-open': showEventModal }">
+      <div class="modal-box">
+        <h3 class="font-bold text-lg mb-4">{{ editingEvent ? 'Modifier' : 'Nouvel' }} événement</h3>
+        <div class="form-control mb-3">
+          <label class="label"><span class="label-text">Titre *</span></label>
+          <input type="text" v-model="eventForm.title" class="input input-bordered">
+        </div>
+        <div class="form-control mb-3">
+          <label class="label"><span class="label-text">Description</span></label>
+          <textarea v-model="eventForm.description" class="textarea textarea-bordered"></textarea>
+        </div>
+        <div class="grid grid-cols-2 gap-4 mb-3">
+          <div class="form-control">
+            <label class="label"><span class="label-text">Début *</span></label>
+            <input type="datetime-local" v-model="eventForm.startAt" class="input input-bordered">
+          </div>
+          <div class="form-control">
+            <label class="label"><span class="label-text">Fin *</span></label>
+            <input type="datetime-local" v-model="eventForm.endAt" class="input input-bordered">
+          </div>
+        </div>
+        <div class="form-control mb-3">
+          <label class="label"><span class="label-text">Lieu</span></label>
+          <input type="text" v-model="eventForm.location" class="input input-bordered">
+        </div>
+        <div class="form-control mb-3">
+          <label class="label"><span class="label-text">Catégorie</span></label>
+          <input type="text" v-model="eventForm.category" class="input input-bordered" placeholder="Ex: Culture, Sport, Réunion...">
+        </div>
+        <div class="modal-action">
+          <button class="btn" @click="closeEventModal">Annuler</button>
+          <button class="btn btn-primary" @click="saveEvent" :disabled="state.submitting">
+            {{ editingEvent ? 'Modifier' : 'Créer' }}
+          </button>
+        </div>
+      </div>
+      <form method="dialog" class="modal-backdrop"><button @click="closeEventModal">close</button></form>
+    </dialog>
+
+    <dialog class="modal" :class="{ 'modal-open': showAddMember }">
+      <div class="modal-box">
+        <h3 class="font-bold text-lg mb-4">Ajouter un membre</h3>
+        <div class="tabs tabs-boxed mb-4">
+          <a class="tab" :class="{ 'tab-active': addMemberMode === 'direct' }" @click="addMemberMode = 'direct'">Utilisateur existant</a>
+          <a class="tab" :class="{ 'tab-active': addMemberMode === 'invite' }" @click="addMemberMode = 'invite'">Invitation par email</a>
+        </div>
+        <div class="form-control mb-3">
+          <label class="label"><span class="label-text">Email</span></label>
+          <input type="email" v-model="memberForm.email" class="input input-bordered">
+        </div>
+        <div class="form-control mb-3">
+          <label class="label"><span class="label-text">Rôle</span></label>
+          <select v-model="memberForm.role" class="select select-bordered">
+            <option value="member">Membre</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+        <div class="form-control mb-4" v-if="addMemberMode === 'direct'">
+          <label class="label cursor-pointer justify-start gap-4">
+            <input type="checkbox" v-model="memberForm.sendNotification" class="checkbox">
+            <span class="label-text">Envoyer une notification par email</span>
+          </label>
+        </div>
+        <div class="modal-action">
+          <button class="btn" @click="showAddMember = false">Annuler</button>
+          <button class="btn btn-primary" @click="addMember" :disabled="state.submitting">
+            {{ addMemberMode === 'invite' ? 'Envoyer l\'invitation' : 'Ajouter' }}
+          </button>
+        </div>
+      </div>
+      <form method="dialog" class="modal-backdrop"><button @click="showAddMember = false">close</button></form>
+    </dialog>
+
+    <dialog class="modal" :class="{ 'modal-open': rejectModal.show }">
+      <div class="modal-box">
+        <h3 class="font-bold text-lg mb-4">Rejeter l'événement</h3>
+        <div class="form-control mb-4">
+          <label class="label"><span class="label-text">Raison du rejet (optionnel)</span></label>
+          <textarea v-model="rejectModal.reason" class="textarea textarea-bordered"></textarea>
+        </div>
+        <div class="modal-action">
+          <button class="btn" @click="rejectModal.show = false">Annuler</button>
+          <button class="btn btn-error" @click="rejectEvent" :disabled="state.submitting">Rejeter</button>
+        </div>
+      </div>
+      <form method="dialog" class="modal-backdrop"><button @click="rejectModal.show = false">close</button></form>
+    </dialog>
+
+    <div class="toast toast-end" v-if="toast.show">
+      <div class="alert" :class="toast.type === 'error' ? 'alert-error' : 'alert-success'">
+        <span>{{ toast.message }}</span>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
