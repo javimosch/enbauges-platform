@@ -1,0 +1,14 @@
+{
+  "app": {
+    "name": "Enbauges",
+    "nav": {
+      "browse_orgs": "Browse organizations",
+      "login": "Login",
+      "dashboard": "Dashboard"
+    }
+  },
+  "landing": {
+    "title": "Public agenda",
+    "subtitle": "Events from all organizations"
+  }
+}

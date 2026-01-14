@@ -1,0 +1,14 @@
+{
+  "app": {
+    "name": "Enbauges",
+    "nav": {
+      "browse_orgs": "Voir les organisations",
+      "login": "Connexion",
+      "dashboard": "Tableau de bord"
+    }
+  },
+  "landing": {
+    "title": "Agenda public",
+    "subtitle": "Événements de toutes les organisations"
+  }
+}

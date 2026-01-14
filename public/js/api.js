@@ -68,15 +68,20 @@ const api = {
   auth: {
     login: (email, password) => api.post('/api/auth/login', { email, password }),
     register: (email, password, name) => api.post('/api/auth/register', { email, password, name }),
-    me: () => api.get('/api/auth/me')
+    me: async () => {
+      const data = await api.get('/api/auth/me');
+      return data.user;
+    }
   },
 
   orgs: {
     list: () => api.get('/api/orgs'),
+    listPublic: () => api.get('/api/orgs/public'),
     create: (data) => api.post('/api/orgs', data),
     get: (id) => api.get(`/api/orgs/${id}`),
     update: (id, data) => api.put(`/api/orgs/${id}`, data),
-    getPublic: (id) => api.get(`/api/orgs/${id}/public`)
+    getPublic: (id) => api.get(`/api/orgs/${id}/public`),
+    join: (id) => api.post(`/api/orgs/${id}/join`, {})
   },
 
   members: {
@@ -97,6 +102,10 @@ const api = {
     list: (orgId, params = {}) => {
       const qs = new URLSearchParams(params).toString();
       return api.get(`/api/enbauges/orgs/${orgId}/events${qs ? '?' + qs : ''}`);
+    },
+    listPublicAll: (params = {}) => {
+      const qs = new URLSearchParams(params).toString();
+      return api.get(`/api/enbauges/events/public${qs ? '?' + qs : ''}`);
     },
     listPublic: (orgId, params = {}) => {
       const qs = new URLSearchParams(params).toString();

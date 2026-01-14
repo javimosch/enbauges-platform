@@ -5,13 +5,16 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "npx nodemon --verbose server.js --watch server.js --watch src"
+    "dev": "npx nodemon --verbose server.js --watch server.js --watch src --watch ../index.js --watch ../src --watch ../views",
+    "generate-og-image": "node scripts/generate-og-image.js",
+    "deploy": "docker build -t javimosch/enbaugesplatform:latest . && docker push javimosch/enbaugesplatform:latest"
   },
   "dependencies": {
     "dotenv": "^16.3.1",
+    "ejs": "^3.1.9",
     "express": "^4.18.2",
     "mongoose": "^8.0.0",
-    "ejs": "^3.1.9"
+    "saasbackend": "^1.4.3"
   },
   "devDependencies": {
     "nodemon": "^3.0.2"

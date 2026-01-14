@@ -4,15 +4,24 @@ exports.listEvents = async (req, res) => {
   try {
     const { status, from, to, limit = 50, offset = 0 } = req.query;
     const query = { orgId: req.org._id };
+    const isAdmin = ['owner', 'admin'].includes(req.orgMember.role);
 
     if (status) {
       query.status = status;
+      if (status === 'pending' && !isAdmin) {
+        query.createdByUserId = req.user._id;
+      }
+    } else if (!isAdmin) {
+      query.$or = [
+        { status: 'approved' },
+        { status: 'pending', createdByUserId: req.user._id }
+      ];
     }
     if (from) {
       query.startAt = { $gte: new Date(from) };
     }
     if (to) {
-      query.endAt = { ...query.endAt, $lte: new Date(to) };
+      query.endAt = { $lte: new Date(to) };
     }
 
     const events = await OrgEvent.find(query)
@@ -41,12 +50,8 @@ exports.listPublicEvents = async (req, res) => {
 
     const query = { orgId, status: 'approved' };
 
-    if (from) {
-      query.startAt = { $gte: new Date(from) };
-    }
-    if (to) {
-      query.endAt = { ...query.endAt, $lte: new Date(to) };
-    }
+    if (from) query.startAt = { $gte: new Date(from) };
+    if (to) query.endAt = { $lte: new Date(to) };
 
     const events = await OrgEvent.find(query)
       .select('title description startAt endAt location category')
@@ -57,6 +62,36 @@ exports.listPublicEvents = async (req, res) => {
     res.json({ events });
   } catch (error) {
     console.error('Error listing public events:', error);
+    res.status(500).json({ error: 'Failed to list events' });
+  }
+};
+
+exports.listPublicEventsAll = async (req, res) => {
+  try {
+    const { from, to, limit = 300 } = req.query;
+
+    const query = { status: 'approved' };
+
+    if (from) query.startAt = { $gte: new Date(from) };
+    if (to) query.endAt = { $lte: new Date(to) };
+
+    const events = await OrgEvent.find(query)
+      .select('orgId title description startAt endAt location category')
+      .populate('orgId', 'name slug')
+      .sort({ startAt: 1 })
+      .limit(parseInt(limit))
+      .lean();
+
+    res.json({
+      events: events.map((e) => ({
+        ...e,
+        org: e.orgId && typeof e.orgId === 'object'
+          ? { _id: e.orgId._id, name: e.orgId.name, slug: e.orgId.slug }
+          : undefined
+      }))
+    });
+  } catch (error) {
+    console.error('Error listing public events (all):', error);
     res.status(500).json({ error: 'Failed to list events' });
   }
 };

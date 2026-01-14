@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <%- include('partials/seo') %>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.19/dist/full.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="/css/theme.css?v=<%= assetVersion %>" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    [v-cloak] { display: none; }
+    .fc-event { cursor: pointer; }
+  </style>
+</head>
+<body class="min-h-screen enbauges-main">
+  <div id="app" v-cloak>
+    <div class="navbar enbauges-navbar bg-base-100 shadow-lg fixed top-0 left-0 right-0 z-50">
+      <div class="flex-1">
+        <a class="btn btn-ghost text-xl enbauges-brand" href="/">
+          <img class="enbauges-brand__logo" src="/brand/enbauges-logo.svg" alt="EnBauges.fr" />
+          EnBauges.fr
+        </a>
+      </div>
+      <div class="flex-none gap-2">
+        <a class="btn btn-ghost btn-sm" href="/browse-orgs"><%= t('app.nav.browse_orgs', null, { defaultValue: 'Organisations' }) %></a>
+        <a class="btn btn-primary btn-sm" href="/login"><%= t('app.nav.login', null, { defaultValue: 'Connexion' }) %></a>
+        <a class="btn btn-ghost btn-sm" href="/dashboard"><%= t('app.nav.dashboard', null, { defaultValue: 'Dashboard' }) %></a>
+      </div>
+    </div>
+
+    <section class="enbauges-hero relative overflow-hidden">
+      <div class="absolute inset-0 -z-10">
+        <video autoplay muted playsinline loop class="w-full h-full object-cover">
+          <source src="/hero/hero.mp4" type="video/mp4" />
+        </video>
+        <div class="absolute inset-0 enbauges-hero__overlay"></div>
+      </div>
+
+      <div class="h-full flex items-center justify-center px-4">
+        <div class="max-w-4xl text-center text-white">
+          <h1 class="text-4xl md:text-6xl font-bold leading-tight" data-i18n-key="landing.hero.title">
+            Le Tiers-Lieu Numérique du Massif des Bauges
+          </h1>
+          <p class="text-lg md:text-2xl text-white/90 mt-6 max-w-3xl mx-auto" data-i18n-key="landing.hero.subtitle">
+            Un collectif local et ouvert qui fédère les ressources du territoire :
+            <span class="block mt-4 font-medium" data-i18n-key="landing.hero.bullets" data-i18n-html>
+              • Associations, tiers-lieux et coworkings ruraux<br />
+              • Événements, entraide et initiatives locales<br />
+              • Outils numériques partagés, en commun
+            </span>
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-3 justify-center mt-8">
+            <a href="#agenda" class="btn btn-primary" data-i18n-key="landing.hero.cta_agenda">Voir l’agenda</a>
+            <a href="/browse-orgs" class="btn btn-outline text-white border-white/40 hover:border-white" data-i18n-key="landing.hero.cta_browse_orgs">Découvrir les organisations</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="enbauges-container pt-24">
+      <div class="enbauges-section">
+        <div class="text-center mb-10">
+          <h2 class="enbauges-section-title" data-i18n-key="landing.section_space.title">Un Espace Numérique pour le Territoire</h2>
+          <p class="enbauges-section-subtitle" data-i18n-key="landing.section_space.subtitle">EnBauges.fr fédère les ressources existantes du massif : associations, tiers-lieux, coworkings ruraux et initiatives citoyennes.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="enbauges-card enbauges-card--hover">
+            <div class="card-body">
+              <h3 class="text-xl font-semibold" data-i18n-key="landing.section_space.card1.title">Tiers-Lieux & Coworkings</h3>
+              <p class="text-sm text-base-content/70" data-i18n-key="landing.section_space.card1.body">Espaces de travail partagés, fablabs, ateliers — trouvez où travailler et créer dans les Bauges</p>
+            </div>
+          </div>
+          <div class="enbauges-card enbauges-card--hover">
+            <div class="card-body">
+              <h3 class="text-xl font-semibold" data-i18n-key="landing.section_space.card2.title">Associations & Collectifs</h3>
+              <p class="text-sm text-base-content/70" data-i18n-key="landing.section_space.card2.body">Annuaire des acteurs locaux : culture, sport, environnement, solidarité</p>
+            </div>
+          </div>
+          <div class="enbauges-card enbauges-card--hover">
+            <div class="card-body">
+              <h3 class="text-xl font-semibold" data-i18n-key="landing.section_space.card3.title">Agenda Partagé</h3>
+              <p class="text-sm text-base-content/70" data-i18n-key="landing.section_space.card3.body">Événements, ateliers, marchés — un calendrier commun pour tout le massif</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="enbauges-section">
+        <div class="enbauges-card">
+          <div class="card-body">
+            <h2 class="card-title" data-i18n-key="landing.metrics.title">Impact Numérique</h2>
+            <p class="text-sm text-base-content/70" data-i18n-key="landing.metrics.subtitle">Notre plateforme en chiffres ce mois-ci</p>
+
+            <div v-if="state.metrics.error" class="alert alert-error mt-4">{{ state.metrics.error }}</div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+              <div class="enbauges-stat text-center p-6">
+                <div class="text-4xl font-bold text-primary mb-2">{{ formatCompactNumber(state.metrics.activeUsers) }}+</div>
+                <div class="text-xl font-semibold text-base-content" data-i18n-key="landing.metrics.active_users.title">Utilisateurs Actifs</div>
+                <div class="text-sm text-base-content/70" data-i18n-key="landing.metrics.active_users.subtitle">Membres de la communauté</div>
+              </div>
+              <div class="enbauges-stat text-center p-6">
+                <div class="text-4xl font-bold text-primary mb-2">{{ formatCompactNumber(state.metrics.servicesConsulted) }}</div>
+                <div class="text-xl font-semibold text-base-content" data-i18n-key="landing.metrics.services_consulted.title">Services Consultés</div>
+                <div class="text-sm text-base-content/70" data-i18n-key="landing.metrics.services_consulted.subtitle">Interactions mensuelles</div>
+              </div>
+              <div class="enbauges-stat text-center p-6">
+                <div class="text-4xl font-bold text-primary mb-2">{{ formatCompactNumber(state.metrics.newsletterSubscribers) }}+</div>
+                <div class="text-xl font-semibold text-base-content" data-i18n-key="landing.metrics.newsletter_subscribers.title">Abonnés Newsletter</div>
+                <div class="text-sm text-base-content/70" data-i18n-key="landing.metrics.newsletter_subscribers.subtitle">Membres informés</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="enbauges-section">
+        <div class="enbauges-card">
+          <div class="card-body">
+            <h2 class="card-title" data-i18n-key="landing.services.title">Ce que vous trouverez ici</h2>
+            <p class="text-sm text-base-content/70" data-i18n-key="landing.services.subtitle">Des outils numériques partagés, construits avec et pour les habitants du massif</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+              <div class="enbauges-card enbauges-card--soft enbauges-card--hover cursor-pointer" role="button" tabindex="0" @click="trackService('coworkings_ruraux')">
+                <div class="card-body">
+                  <h3 class="text-xl font-semibold" data-i18n-key="landing.services.coworkings.title">Coworkings Ruraux</h3>
+                  <p class="text-sm text-base-content/70" data-i18n-key="landing.services.coworkings.body">Bureaux partagés, espaces de télétravail — travaillez près de chez vous</p>
+                </div>
+              </div>
+              <div class="enbauges-card enbauges-card--soft enbauges-card--hover cursor-pointer" role="button" tabindex="0" @click="trackService('fablabs_ateliers')">
+                <div class="card-body">
+                  <h3 class="text-xl font-semibold" data-i18n-key="landing.services.fablabs.title">Fablabs & Ateliers</h3>
+                  <p class="text-sm text-base-content/70" data-i18n-key="landing.services.fablabs.body">Espaces de fabrication, repair cafés, ateliers partagés</p>
+                </div>
+              </div>
+              <div class="enbauges-card enbauges-card--soft enbauges-card--hover cursor-pointer" role="button" tabindex="0" @click="trackService('agenda_territorial')">
+                <div class="card-body">
+                  <h3 class="text-xl font-semibold" data-i18n-key="landing.services.agenda.title">Agenda Territorial</h3>
+                  <p class="text-sm text-base-content/70" data-i18n-key="landing.services.agenda.body">Événements des associations, communes et collectifs</p>
+                </div>
+              </div>
+              <div class="enbauges-card enbauges-card--soft enbauges-card--hover cursor-pointer" role="button" tabindex="0" @click="trackService('annuaire_local')">
+                <div class="card-body">
+                  <h3 class="text-xl font-semibold" data-i18n-key="landing.services.directory.title">Annuaire Local</h3>
+                  <p class="text-sm text-base-content/70" data-i18n-key="landing.services.directory.body">Associations, producteurs, artisans, services de proximité</p>
+                </div>
+              </div>
+              <div class="enbauges-card enbauges-card--soft enbauges-card--hover cursor-pointer" role="button" tabindex="0" @click="trackService('entraide')">
+                <div class="card-body">
+                  <h3 class="text-xl font-semibold" data-i18n-key="landing.services.mutual_aid.title">Entraide & Coups de Main</h3>
+                  <p class="text-sm text-base-content/70" data-i18n-key="landing.services.mutual_aid.body">Proposez ou demandez de l'aide entre voisins</p>
+                </div>
+              </div>
+              <div class="enbauges-card enbauges-card--soft enbauges-card--hover cursor-pointer" role="button" tabindex="0" @click="trackService('ressources_partagees')">
+                <div class="card-body">
+                  <h3 class="text-xl font-semibold" data-i18n-key="landing.services.resources.title">Ressources Partagées</h3>
+                  <p class="text-sm text-base-content/70" data-i18n-key="landing.services.resources.body">Guides, documents, bonnes pratiques du territoire</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="enbauges-section">
+        <div class="enbauges-card">
+          <div class="card-body">
+            <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-2">
+              <div>
+                <h2 class="card-title" data-i18n-key="landing.future_tools.title">Outils à venir</h2>
+                <p class="text-sm text-base-content/70" data-i18n-key="landing.future_tools.subtitle">Des utilitaires pensés pour les associations, tiers-lieux et coworkings ruraux du massif.</p>
+              </div>
+              <div class="text-sm text-base-content/60" data-i18n-key="landing.future_tools.note">Ces fonctionnalités sont des pistes — elles seront construites avec le territoire.</div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+              <div class="enbauges-card enbauges-card--soft">
+                <div class="card-body">
+                  <div class="flex items-start justify-between gap-3">
+                    <h3 class="text-xl font-semibold" data-i18n-key="landing.future_tools.items.booking.title">Réservation d'espaces</h3>
+                    <span class="badge badge-warning" data-i18n-key="landing.future_tools.badge_soon">Bientôt</span>
+                  </div>
+                  <p class="text-sm text-base-content/70" data-i18n-key="landing.future_tools.items.booking.body">Créneaux de salles, bureaux et ateliers — une réservation simple, partagée, sans friction.</p>
+                </div>
+              </div>
+              <div class="enbauges-card enbauges-card--soft">
+                <div class="card-body">
+                  <div class="flex items-start justify-between gap-3">
+                    <h3 class="text-xl font-semibold" data-i18n-key="landing.future_tools.items.map.title">Carte des ressources</h3>
+                    <span class="badge badge-warning" data-i18n-key="landing.future_tools.badge_soon">Bientôt</span>
+                  </div>
+                  <p class="text-sm text-base-content/70" data-i18n-key="landing.future_tools.items.map.body">Une carte vivante : tiers-lieux, services, points d'entraide, équipements mutualisés.</p>
+                </div>
+              </div>
+              <div class="enbauges-card enbauges-card--soft">
+                <div class="card-body">
+                  <div class="flex items-start justify-between gap-3">
+                    <h3 class="text-xl font-semibold" data-i18n-key="landing.future_tools.items.kit.title">Kit asso (outils)</h3>
+                    <span class="badge badge-warning" data-i18n-key="landing.future_tools.badge_soon">Bientôt</span>
+                  </div>
+                  <p class="text-sm text-base-content/70" data-i18n-key="landing.future_tools.items.kit.body">Modèles, checklists, formulaires : organiser un événement, communiquer, gérer les bénévoles.</p>
+                </div>
+              </div>
+              <div class="enbauges-card enbauges-card--soft">
+                <div class="card-body">
+                  <div class="flex items-start justify-between gap-3">
+                    <h3 class="text-xl font-semibold" data-i18n-key="landing.future_tools.items.donations.title">Dons & adhésions</h3>
+                    <span class="badge badge-warning" data-i18n-key="landing.future_tools.badge_soon">Bientôt</span>
+                  </div>
+                  <p class="text-sm text-base-content/70" data-i18n-key="landing.future_tools.items.donations.body">Soutenir une asso ou un lieu (adhésion / don) avec transparence, sans dépendre d'une plateforme privée.</p>
+                </div>
+              </div>
+              <div class="enbauges-card enbauges-card--soft">
+                <div class="card-body">
+                  <div class="flex items-start justify-between gap-3">
+                    <h3 class="text-xl font-semibold" data-i18n-key="landing.future_tools.items.classifieds.title">Petites annonces locales</h3>
+                    <span class="badge badge-warning" data-i18n-key="landing.future_tools.badge_soon">Bientôt</span>
+                  </div>
+                  <p class="text-sm text-base-content/70" data-i18n-key="landing.future_tools.items.classifieds.body">Je propose / je cherche : covoiturage, matériel, coups de main, compétences.</p>
+                </div>
+              </div>
+              <div class="enbauges-card enbauges-card--soft">
+                <div class="card-body">
+                  <div class="flex items-start justify-between gap-3">
+                    <h3 class="text-xl font-semibold" data-i18n-key="landing.future_tools.items.governance.title">Gouvernance & contributions</h3>
+                    <span class="badge badge-warning" data-i18n-key="landing.future_tools.badge_soon">Bientôt</span>
+                  </div>
+                  <p class="text-sm text-base-content/70" data-i18n-key="landing.future_tools.items.governance.body">Historique public, règles de contribution, modération — pour un commun durable et de confiance.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="enbauges-section">
+        <div class="enbauges-card">
+          <div class="card-body">
+            <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-2">
+              <div>
+                <h2 class="card-title" data-i18n-key="landing.partner_resources.title">Ressources partenaires</h2>
+                <p class="text-sm text-base-content/70" data-i18n-key="landing.partner_resources.subtitle">Backlinks vers des ressources existantes du territoire (annuaire, emploi, logement…).</p>
+              </div>
+              <div class="text-sm text-base-content/60" data-i18n-key="landing.partner_resources.partner_label" data-i18n-html>Partenaire : <span class="font-semibold text-base-content">Les Amis des Bauges</span></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+              <a class="enbauges-card enbauges-card--soft enbauges-card--hover block" href="https://www.amisdesbauges.org/associations/" target="_blank" rel="noopener noreferrer">
+                <div class="card-body">
+                  <div class="flex items-start justify-between gap-3">
+                    <h3 class="text-xl font-semibold" data-i18n-key="landing.partner_resources.items.associations.title">Annuaire des associations</h3>
+                    <span class="badge badge-outline" data-i18n-key="landing.partner_resources.badge_external">Externe</span>
+                  </div>
+                  <p class="text-sm text-base-content/70" data-i18n-key="landing.partner_resources.items.associations.body">Accéder à l’annuaire des associations du Cœur des Bauges.</p>
+                  <div class="text-sm text-base-content/60 mt-2">amisdesbauges.org</div>
+                </div>
+              </a>
+
+              <a class="enbauges-card enbauges-card--soft enbauges-card--hover block" href="https://www.amisdesbauges.org/offres-emploi/" target="_blank" rel="noopener noreferrer">
+                <div class="card-body">
+                  <div class="flex items-start justify-between gap-3">
+                    <h3 class="text-xl font-semibold" data-i18n-key="landing.partner_resources.items.jobs.title">Offres d’emploi</h3>
+                    <span class="badge badge-outline" data-i18n-key="landing.partner_resources.badge_external">Externe</span>
+                  </div>
+                  <p class="text-sm text-base-content/70" data-i18n-key="landing.partner_resources.items.jobs.body">Consulter les offres et ressources emploi du territoire.</p>
+                  <div class="text-sm text-base-content/60 mt-2">amisdesbauges.org</div>
+                </div>
+              </a>
+
+              <a class="enbauges-card enbauges-card--soft enbauges-card--hover block" href="https://www.amisdesbauges.org/logement/" target="_blank" rel="noopener noreferrer">
+                <div class="card-body">
+                  <div class="flex items-start justify-between gap-3">
+                    <h3 class="text-xl font-semibold" data-i18n-key="landing.partner_resources.items.housing.title">Logement</h3>
+                    <span class="badge badge-outline" data-i18n-key="landing.partner_resources.badge_external">Externe</span>
+                  </div>
+                  <p class="text-sm text-base-content/70" data-i18n-key="landing.partner_resources.items.housing.body">Infos logement et annonces (selon les publications).</p>
+                  <div class="text-sm text-base-content/60 mt-2">amisdesbauges.org</div>
+                </div>
+              </a>
+
+              <a class="enbauges-card enbauges-card--soft enbauges-card--hover block" href="https://www.amisdesbauges.org/aps/" target="_blank" rel="noopener noreferrer">
+                <div class="card-body">
+                  <div class="flex items-start justify-between gap-3">
+                    <h3 class="text-xl font-semibold" data-i18n-key="landing.partner_resources.items.leisure.title">Centre de loisirs</h3>
+                    <span class="badge badge-outline" data-i18n-key="landing.partner_resources.badge_external">Externe</span>
+                  </div>
+                  <p class="text-sm text-base-content/70" data-i18n-key="landing.partner_resources.items.leisure.body">Accueil de loisirs / APS (infos et inscriptions).</p>
+                  <div class="text-sm text-base-content/60 mt-2">amisdesbauges.org</div>
+                </div>
+              </a>
+
+              <a class="enbauges-card enbauges-card--soft enbauges-card--hover block" href="https://www.amisdesbauges.org/petite-enfance/" target="_blank" rel="noopener noreferrer">
+                <div class="card-body">
+                  <div class="flex items-start justify-between gap-3">
+                    <h3 class="text-xl font-semibold" data-i18n-key="landing.partner_resources.items.childhood.title">Petite enfance</h3>
+                    <span class="badge badge-outline" data-i18n-key="landing.partner_resources.badge_external">Externe</span>
+                  </div>
+                  <p class="text-sm text-base-content/70" data-i18n-key="landing.partner_resources.items.childhood.body">Structures petite enfance (dont la crèche La Farandole).</p>
+                  <div class="text-sm text-base-content/60 mt-2">amisdesbauges.org</div>
+                </div>
+              </a>
+            </div>
+
+            <div class="text-sm text-base-content/60 mt-6">
+              <span data-i18n-key="landing.partner_resources.cta_text">Si vous gérez une ressource du massif et souhaitez être référencé(e),</span>
+              <a class="link link-hover" href="/contact" data-i18n-key="landing.partner_resources.cta_link">contactez-nous</a>.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="py-6">
+        <div class="card bg-base-100 shadow-xl">
+          <div class="card-body">
+            <h2 class="card-title" data-i18n-key="landing.explainer.title">Un Tiers-Lieu Numérique, c'est quoi ?</h2>
+            <p class="text-sm text-base-content/70 mb-4" data-i18n-key="landing.explainer.subtitle">Comme un tiers-lieu physique (coworking, fablab, café associatif), mais en version digitale : un espace partagé, ouvert, géré collectivement.</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
+              <div>
+                <div class="font-semibold" data-i18n-key="landing.explainer.items.shared_resources.title">Ressources mutualisées</div>
+                <div class="text-sm text-base-content/70" data-i18n-key="landing.explainer.items.shared_resources.body">Agenda, annuaire, outils — tout ce qui existe déjà sur le territoire, visible en un seul endroit.</div>
+              </div>
+              <div>
+                <div class="font-semibold" data-i18n-key="landing.explainer.items.open_community.title">Communauté ouverte</div>
+                <div class="text-sm text-base-content/70" data-i18n-key="landing.explainer.items.open_community.body">Habitants, associations, tiers-lieux, communes — chacun peut contribuer.</div>
+              </div>
+              <div>
+                <div class="font-semibold" data-i18n-key="landing.explainer.items.local_governance.title">Gouvernance locale</div>
+                <div class="text-sm text-base-content/70" data-i18n-key="landing.explainer.items.local_governance.body">Pas de structure imposée : un collectif informel, transparent, au service du territoire.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="py-6">
+        <div class="card bg-base-100 shadow-xl">
+          <div class="card-body text-center">
+            <h2 class="text-3xl font-bold" data-i18n-key="landing.account_cta.title">Un Compte Unique est Plus Simple</h2>
+            <p class="text-base-content/70 mt-2" data-i18n-key="landing.account_cta.subtitle">Inscrivez-vous dès maintenant pour accéder à tous nos services numériques dès qu'ils seront disponibles.</p>
+            <div class="flex flex-col sm:flex-row gap-3 justify-center mt-6">
+              <a class="btn btn-primary" href="/login" data-i18n-key="landing.account_cta.cta_signup">S'inscrire</a>
+              <a class="btn btn-outline" href="/login" data-i18n-key="landing.account_cta.cta_login">Connexion</a>
+            </div>
+            <p class="text-xs text-base-content/60 mt-3" data-i18n-key="landing.account_cta.legal">En vous inscrivant, vous acceptez nos conditions d'utilisation et notre politique de confidentialité.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="py-6">
+        <div class="card bg-base-100 shadow-xl">
+          <div class="card-body text-center">
+            <h2 class="text-3xl font-bold" data-i18n-key="landing.newsletter.title">Restez Informé</h2>
+            <p class="text-base-content/70 mt-2" data-i18n-key="landing.newsletter.subtitle">Recevez les dernières actualités des Bauges : nouveaux services, événements et initiatives.</p>
+            <form class="flex flex-col sm:flex-row gap-3 justify-center mt-6" @submit.prevent="submitNewsletter">
+              <input v-model="state.newsletter.email" type="email" required placeholder="Votre adresse email" class="input input-bordered w-full sm:max-w-md" :disabled="state.newsletter.submitting" data-i18n-key="landing.newsletter.placeholder_email" data-i18n-attr="placeholder" />
+              <button type="submit" class="btn btn-primary" :disabled="state.newsletter.submitting">
+                <span v-if="state.newsletter.submitting" data-i18n-key="landing.newsletter.submit_sending">Envoi…</span>
+                <span v-else data-i18n-key="landing.newsletter.submit_idle">S'abonner</span>
+              </button>
+            </form>
+
+            <div v-if="state.newsletter.success" class="alert alert-success mt-4 inline-flex text-left">{{ state.newsletter.success }}</div>
+            <div v-if="state.newsletter.error" class="alert alert-error mt-4 inline-flex text-left">{{ state.newsletter.error }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="agenda" class="enbauges-section enbauges-anchor">
+        <div v-if="state.loading" class="flex justify-center py-20">
+          <span class="loading loading-spinner loading-lg"></span>
+        </div>
+
+        <div v-else>
+          <%- include('partials/landing-calendar') %>
+          <div v-if="state.error" class="alert alert-error mt-4">{{ state.error }}</div>
+        </div>
+      </div>
+
+      <div class="py-6">
+        <div class="card bg-base-100 shadow-xl">
+          <div class="card-body">
+            <h2 class="card-title" data-i18n-key="landing.sponsors.title">Sponsors</h2>
+            <div class="text-sm text-base-content/70" data-i18n-key="landing.sponsors.subtitle">Merci à celles et ceux qui soutiennent EnBauges.fr.</div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 items-center mt-4">
+              <a class="flex justify-center" href="https://alposs.fr/" target="_blank" rel="noopener noreferrer">
+                <img
+                  src="/sponsors/alposs.png"
+                  alt="PLOSS-RA"
+                  class="max-h-14 w-auto opacity-80 hover:opacity-100 transition"
+                  loading="lazy"
+                />
+              </a>
+              <a class="flex justify-center" href="https://www.univ-grenoble-alpes.fr/" target="_blank" rel="noopener noreferrer">
+                <img
+                  src="/sponsors/uga.png"
+                  alt="Université Grenoble Alpes"
+                  class="max-h-14 w-auto opacity-80 hover:opacity-100 transition"
+                  loading="lazy"
+                />
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <%- include('partials/footer') %>
+    </div>
+  </div>
+
+  <script src="/js/api.js?v=<%= assetVersion %>"></script>
+  <script src="/js/landing.js?v=<%= assetVersion %>"></script>
+</body>
+</html>

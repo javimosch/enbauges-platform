@@ -1,0 +1,43 @@
+<% const seoTitle = (typeof title !== 'undefined' && title) ? title : 'EnBauges.fr'; %>
+<% const seoDescription = (typeof description !== 'undefined' && description) ? description : "Le tiers-lieu numérique du Massif des Bauges — un collectif local, ouvert et bénévole."; %>
+<% const seoCanonicalUrl = (typeof canonicalUrl !== 'undefined' && canonicalUrl) ? canonicalUrl : ((typeof publicUrl !== 'undefined' && publicUrl) ? publicUrl : ''); %>
+<% const seoRobots = (typeof robots !== 'undefined' && robots) ? robots : 'index,follow'; %>
+
+<% const ogPng = (typeof publicUrl !== 'undefined' && publicUrl)
+  ? `${publicUrl}/og/og-image.png${(typeof assetVersion !== 'undefined' && assetVersion) ? `?v=${assetVersion}` : ''}`
+  : '/og/og-image.png'; %>
+<% const ogSvg = (typeof publicUrl !== 'undefined' && publicUrl)
+  ? `${publicUrl}/og/og-image.svg${(typeof assetVersion !== 'undefined' && assetVersion) ? `?v=${assetVersion}` : ''}`
+  : '/og/og-image.svg'; %>
+
+<meta name="description" content="<%= seoDescription %>">
+<meta name="robots" content="<%= seoRobots %>">
+<link rel="canonical" href="<%= seoCanonicalUrl %>">
+
+<% if (typeof i18nInjectMeta !== 'undefined' && i18nInjectMeta === '1') { %>
+  <script src="/js/footer-lang-selector.js?v=<%= assetVersion %>" defer></script>
+<% } %>
+
+<script src="/js/i18n-inject.js?v=<%= assetVersion %>" defer></script>
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="EnBauges.fr">
+<meta property="og:title" content="<%= seoTitle %>">
+<meta property="og:description" content="<%= seoDescription %>">
+<meta property="og:url" content="<%= seoCanonicalUrl %>">
+<meta property="og:image" content="<%= ogPng %>">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:alt" content="EnBauges.fr — le tiers-lieu numérique du Massif des Bauges">
+
+<meta property="og:image" content="<%= ogSvg %>">
+<meta property="og:image:alt" content="EnBauges.fr — le tiers-lieu numérique du Massif des Bauges">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="<%= seoTitle %>">
+<meta name="twitter:description" content="<%= seoDescription %>">
+<meta name="twitter:image" content="<%= ogPng %>">
+<meta name="twitter:image:alt" content="EnBauges.fr — le tiers-lieu numérique du Massif des Bauges">
+
+<link rel="icon" href="/brand/enbauges-logo.svg" type="image/svg+xml">

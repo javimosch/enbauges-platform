@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <%- include('partials/seo') %>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.19/dist/full.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="/css/theme.css?v=<%= assetVersion %>" rel="stylesheet">
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    [v-cloak] { display: none; }
+  </style>
+</head>
+<body class="min-h-screen enbauges-main">
+  <div id="app" v-cloak>
+    <div class="navbar bg-base-100 shadow-lg">
+      <div class="flex-1">
+        <a class="btn btn-ghost text-xl enbauges-brand" href="/">
+          <img class="enbauges-brand__logo" src="/brand/enbauges-logo.svg" alt="EnBauges.fr" />
+          EnBauges.fr
+        </a>
+      </div>
+      <div class="flex-none gap-2">
+        <a class="btn btn-ghost btn-sm" href="/">Agenda</a>
+        <a class="btn btn-primary btn-sm" href="/login" v-if="!state.user">Connexion</a>
+        <a class="btn btn-ghost btn-sm" href="/dashboard" v-else>Dashboard</a>
+      </div>
+    </div>
+
+    <div class="enbauges-container pt-6">
+      <div class="enbauges-section">
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-3 mb-6">
+          <div>
+            <h1 class="enbauges-section-title">Organisations</h1>
+            <div class="text-sm text-base-content/70 mt-2">Découvrez les organisations actives dans le Massif des Bauges.</div>
+          </div>
+          <div class="text-sm text-base-content/70" v-if="state.user">
+            Connecté en tant que <span class="font-semibold text-base-content">{{ state.user.email }}</span>
+          </div>
+        </div>
+
+        <div v-if="state.loading" class="flex justify-center py-20">
+          <span class="loading loading-spinner loading-lg"></span>
+        </div>
+
+        <div v-else>
+          <div v-if="state.error" class="alert alert-error mb-6">{{ state.error }}</div>
+
+          <div v-if="!orgs.length" class="enbauges-card">
+            <div class="card-body">
+              <h2 class="text-xl font-semibold">Aucune organisation pour le moment</h2>
+              <div class="text-sm text-base-content/70">Revenez plus tard, ou contactez-nous si vous souhaitez référencer votre organisation.</div>
+              <div class="mt-4">
+                <a class="btn btn-outline" href="/contact">Contactez-nous</a>
+              </div>
+            </div>
+          </div>
+
+          <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <div class="enbauges-card enbauges-card--hover" v-for="org in orgs" :key="org._id">
+              <div class="card-body">
+                <div class="flex items-start justify-between gap-3">
+                  <h2 class="text-xl font-semibold leading-tight">{{ org.name }}</h2>
+                  <span class="badge" :class="org.allowPublicJoin ? 'badge-success' : 'badge-ghost'">
+                    {{ org.allowPublicJoin ? 'Inscription publique' : 'Sur invitation' }}
+                  </span>
+                </div>
+                <p class="text-sm text-base-content/70 mt-1" v-if="org.description">{{ org.description }}</p>
+
+                <div class="card-actions justify-end mt-6">
+                  <button class="btn btn-primary btn-sm" v-if="org.allowPublicJoin" @click="joinOrg(org)" :disabled="state.submitting">
+                    {{ state.submitting ? '...' : 'Rejoindre' }}
+                  </button>
+                  <button class="btn btn-ghost btn-sm" v-else disabled>Invitation requise</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="enbauges-card mt-6" v-if="!state.user">
+            <div class="card-body">
+              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div>
+                  <div class="font-semibold">Pour rejoindre une organisation</div>
+                  <div class="text-sm text-base-content/70">Connectez-vous, puis cliquez sur “Rejoindre”.</div>
+                </div>
+                <a class="btn btn-primary btn-sm" href="/login">Connexion</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast toast-end" v-if="toast.show">
+      <div class="alert" :class="toast.type === 'error' ? 'alert-error' : 'alert-success'">
+        <span>{{ toast.message }}</span>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/api.js?v=<%= assetVersion %>"></script>
+  <script src="/js/browse-orgs.js?v=<%= assetVersion %>"></script>
+</body>
+</html>

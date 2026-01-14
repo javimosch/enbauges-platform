@@ -1,0 +1,146 @@
+:root {
+  --enbauges-forest-700: #14532D;
+  --enbauges-forest-600: #166534;
+  --enbauges-sky-700: #0369A1;
+  --enbauges-paper: #FAFAF5;
+}
+
+/* DaisyUI theme overrides (applied on the existing data-theme="light") */
+html[data-theme="light"] {
+  /* Primary (green) */
+  --p: 142 54% 20%;
+  --pf: 142 55% 24%;
+  --pc: 0 0% 100%;
+
+  /* Secondary (sky) */
+  --s: 202 98% 33%;
+  --sf: 202 98% 28%;
+  --sc: 0 0% 100%;
+
+  /* Accent (amber) */
+  --a: 38 92% 50%;
+  --af: 38 92% 44%;
+  --ac: 0 0% 12%;
+
+  /* Base surfaces */
+  --b1: 60 23% 98%; /* paper */
+  --b2: 60 23% 96%;
+  --b3: 220 14% 92%;
+  --bc: 220 10% 14%;
+}
+
+/* Small brand affordances */
+.enbauges-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.enbauges-brand__logo {
+  width: 26px;
+  height: 26px;
+}
+
+.enbauges-main {
+  background: hsl(var(--b2));
+}
+
+.enbauges-container {
+  max-width: 72rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.enbauges-section {
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+}
+
+@media (min-width: 640px) {
+  .enbauges-section {
+    padding-top: 3.5rem;
+    padding-bottom: 3.5rem;
+  }
+}
+
+.enbauges-section-title {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+@media (min-width: 768px) {
+  .enbauges-section-title {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+  }
+}
+
+.enbauges-section-subtitle {
+  margin-top: 0.5rem;
+  color: hsl(var(--bc) / 0.7);
+}
+
+.enbauges-card {
+  border: 1px solid hsl(var(--b3));
+  border-radius: 1rem;
+  background: hsl(var(--b1));
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+}
+
+.enbauges-card--soft {
+  background: hsl(var(--b2));
+}
+
+.enbauges-card--hover {
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.enbauges-card--hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 45px rgba(0,0,0,0.10);
+}
+
+.enbauges-stat {
+  border-radius: 1rem;
+  background: hsl(var(--b2));
+  border: 1px solid hsl(var(--b3));
+}
+
+.enbauges-anchor {
+  scroll-margin-top: 5.5rem;
+}
+
+/* Force the landing navbar to be fully opaque (avoid video bleed-through) */
+.enbauges-navbar {
+  background-color: hsl(var(--b1)) !important;
+  opacity: 1 !important;
+  backdrop-filter: none !important;
+}
+
+/* Landing hero video */
+.enbauges-hero {
+  height: 100vh;
+  height: 100svh;
+}
+
+.enbauges-hero__overlay {
+  background: linear-gradient(
+    180deg,
+    rgba(0,0,0,0.55) 0%,
+    rgba(0,0,0,0.55) 45%,
+    rgba(0,0,0,0.70) 100%
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enbauges-hero video {
+    display: none;
+  }
+  .enbauges-hero {
+    background: #0C0E10;
+  }
+}

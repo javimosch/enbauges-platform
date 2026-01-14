@@ -1,0 +1,32 @@
+services:
+  app:
+    image: javimosch/enbaugesplatform:latest
+    container_name: enbauges_platform
+    expose:
+      - "3000"
+    env_file:
+      - .env
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+    working_dir: /app
+    volumes:
+      - uploads-data:/app/uploads
+      - ./src:/app/src
+      - ./locales:/app/locales
+      - ./scripts:/app/scripts
+      - ./public:/app/public
+      - ./views:/app/views
+      - ./server.js:/app/server.js
+    restart: unless-stopped
+    networks:
+      - coolify-shared
+    command: ["npm", "start"]
+
+volumes:
+  uploads-data:
+    driver: local
+
+networks:
+  coolify-shared:
+    external: true

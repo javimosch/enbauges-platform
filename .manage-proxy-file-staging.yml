@@ -1,0 +1,15 @@
+http:
+  routers:
+    enbauges_platform-staging:
+      entryPoints:
+        - https
+      service: enbauges_platform-staging
+      rule: Host(`enbauges.fr`)
+      tls:
+        certresolver: letsencrypt
+  services:
+    enbauges_platform-staging:
+      loadBalancer:
+        servers:
+          -
+            url: 'http://enbauges_platform:3000'

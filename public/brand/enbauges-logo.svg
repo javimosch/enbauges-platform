@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" fill="none" role="img" aria-label="EnBauges.fr">
+  <defs>
+    <linearGradient id="g" x1="12" y1="104" x2="116" y2="24" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#14532D"/>
+      <stop offset="1" stop-color="#166534"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="8" y="8" width="112" height="112" rx="24" fill="#FAFAF5"/>
+
+  <!-- Stylized Bauges ridge / peaks -->
+  <path d="M22 86 L44 60 L58 74 L74 50 L92 70 L106 56 L106 92 L22 92 Z" fill="url(#g)"/>
+
+  <!-- River / valley line -->
+  <path d="M30 92 C46 84, 58 84, 74 92 C86 98, 98 98, 110 92" stroke="#0369A1" stroke-width="6" stroke-linecap="round" fill="none" opacity="0.9"/>
+
+  <!-- Dot = local point / community -->
+  <circle cx="52" cy="60" r="6" fill="#0C0E10" opacity="0.85"/>
+</svg>

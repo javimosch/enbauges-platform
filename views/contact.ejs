@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <%- include('partials/seo') %>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.19/dist/full.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="/css/theme.css?v=<%= assetVersion %>" rel="stylesheet">
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    [v-cloak] { display: none; }
+  </style>
+</head>
+<body class="min-h-screen enbauges-main">
+  <div id="app" v-cloak>
+    <div class="navbar bg-base-100 shadow-lg">
+      <div class="flex-1">
+        <a class="btn btn-ghost text-xl enbauges-brand" href="/">
+          <img class="enbauges-brand__logo" src="/brand/enbauges-logo.svg" alt="EnBauges.fr" />
+          EnBauges.fr
+        </a>
+      </div>
+      <div class="flex-none gap-2">
+        <a class="btn btn-ghost btn-sm" href="/">Accueil</a>
+        <a class="btn btn-ghost btn-sm" href="/browse-orgs">Organisations</a>
+        <a class="btn btn-primary btn-sm" href="/login" v-if="!state.user">Connexion</a>
+        <a class="btn btn-ghost btn-sm" href="/dashboard" v-else>Dashboard</a>
+      </div>
+    </div>
+
+    <div class="enbauges-container pt-6">
+      <div class="enbauges-section">
+        <div class="enbauges-card">
+          <div class="card-body">
+            <div class="max-w-2xl mx-auto">
+              <h1 class="enbauges-section-title">Contact</h1>
+              <p class="enbauges-section-subtitle">Une question, une ressource à référencer, une idée d’outil ? Écrivez-nous.</p>
+
+              <form class="mt-8 space-y-4" @submit.prevent="submit">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div class="form-control">
+                    <label class="label"><span class="label-text">Nom (optionnel)</span></label>
+                    <input class="input input-bordered" v-model="form.name" placeholder="Votre nom" :disabled="state.submitting" />
+                  </div>
+                  <div class="form-control">
+                    <label class="label"><span class="label-text">Email</span></label>
+                    <input class="input input-bordered" v-model="form.email" type="email" required placeholder="vous@exemple.fr" :disabled="state.submitting" />
+                  </div>
+                </div>
+
+                <div class="form-control">
+                  <label class="label"><span class="label-text">Sujet (optionnel)</span></label>
+                  <input class="input input-bordered" v-model="form.subject" placeholder="De quoi s’agit-il ?" :disabled="state.submitting" />
+                </div>
+
+                <div class="form-control">
+                  <label class="label"><span class="label-text">Message</span></label>
+                  <textarea class="textarea textarea-bordered min-h-[140px]" v-model="form.message" required placeholder="Votre message…" :disabled="state.submitting"></textarea>
+                </div>
+
+                <div class="flex items-center justify-between gap-3">
+                  <button class="btn btn-primary" type="submit" :disabled="state.submitting">
+                    {{ state.submitting ? 'Envoi…' : 'Envoyer' }}
+                  </button>
+                  <a class="btn btn-ghost" href="/">Retour</a>
+                </div>
+
+                <div v-if="state.success" class="alert alert-success">{{ state.success }}</div>
+                <div v-if="state.error" class="alert alert-error">{{ state.error }}</div>
+
+                <div class="text-xs text-base-content/60 pt-2">
+                  En envoyant ce formulaire, vous acceptez que votre message soit enregistré afin que nous puissions vous répondre.
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <%- include('partials/footer') %>
+    </div>
+  </div>
+
+  <script src="/js/api.js?v=<%= assetVersion %>"></script>
+  <script src="/js/contact.js?v=<%= assetVersion %>"></script>
+</body>
+</html>

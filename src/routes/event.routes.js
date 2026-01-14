@@ -1,9 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const { authenticate } = require('../../../src/middleware/auth');
-const { loadOrgContext, requireOrgMember, requireOrgRoleAtLeast } = require('../../../src/middleware/org');
+
+if(!globalThis?.saasbackend?.helpers?.auth){
+    console.error('Error: saasbackend helpers not found');
+    process.exit(1)
+}
+
+const { authenticate } = globalThis.saasbackend.helpers.auth;
+const { loadOrgContext, requireOrgMember, requireOrgRoleAtLeast } = globalThis.saasbackend.helpers.org
 const eventController = require('../controllers/event.controller');
 
+router.get('/events/public', eventController.listPublicEventsAll);
 router.get('/orgs/:orgId/events/public', eventController.listPublicEvents);
 
 router.get('/orgs/:orgId/events', authenticate, loadOrgContext, requireOrgMember, eventController.listEvents);
